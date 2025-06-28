@@ -52,8 +52,8 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/smart-recipe-analyzer.git
-   cd smart-recipe-analyzer
+   git clone https://github.com/Huvinesh-Rajendran-12/axium-tutorial.git
+   cd axium-tutorial
    ```
 
 2. **Install dependencies**
@@ -66,21 +66,14 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
    ```
 
 3. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   
    Edit `.env` and add your API credentials:
    ```env
-   # For OpenAI
-   LLM_PROVIDER=openai
-   LLM_MODEL=gpt-3.5-turbo
-   LLM_API_KEY=your-openai-api-key
-   
    # For Anthropic
    LLM_PROVIDER=anthropic
-   LLM_MODEL=claude-3-sonnet-20240229
+   LLM_MODEL_ANTHROPIC=claude-3-sonnet-20240229
    ANTHROPIC_API_KEY=your-anthropic-api-key
+   LLM_MODEL_GEMINI=gemini-2.5-flash
+   GEMINI_API_KEY=your-gemini-api-key
    ```
 
 4. **Run the server**
