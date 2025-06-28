@@ -38,6 +38,14 @@ def main():
         help="Enable agentic mode with tools (default: non-agentic)"
     )
     
+    # Model configuration
+    parser.add_argument(
+        "--model",
+        choices=["anthropic", "gemini"],
+        default="anthropic",
+        help="Choose LLM model provider (default: anthropic)"
+    )
+    
     args = parser.parse_args()
     
     # Set environment variables based on arguments
@@ -49,6 +57,13 @@ def main():
         print("🤖 Starting in AGENTIC mode with tools...")
     else:
         print("🧠 Starting in STANDARD mode...")
+    
+    # Set model provider
+    os.environ["LLM_PROVIDER"] = args.model
+    if args.model == "anthropic":
+        print("🧪 Using Anthropic Claude model")
+    elif args.model == "gemini":
+        print("💎 Using Google Gemini model")
     
     # Import after setting environment variables
     from backend.config import HOST, PORT, DEBUG

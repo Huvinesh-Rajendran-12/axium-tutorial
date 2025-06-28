@@ -24,7 +24,7 @@ AGENTIC_MODE = os.getenv("AGENTIC_MODE", "False").lower() == "true"
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 # LLM Configuration
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")  # openai, anthropic, etc.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic")  # anthropic, gemini
 LLM_MODEL_ANTHROPIC = os.getenv(
     "LLM_MODEL_ANTHROPIC", "anthropic/claude-sonnet-4-20250514"
 )
@@ -46,16 +46,22 @@ RATE_LIMIT_PERIOD = int(os.getenv("RATE_LIMIT_PERIOD", "3600"))  # seconds
 # Initialize DSPy
 def init_dspy():
     """Initialize DSPy with configured LLM."""
-    llm_api_key = LLM_API_KEY_ANTHROPIC or LLM_API_KEY_GEMINI
-    if not llm_api_key:
-        raise ValueError("ANTHROPIC_API_KEY or GEMINI_API_KEY environment variable is not set")
-
-    # Use Anthropic model by default
-    model = LLM_MODEL_ANTHROPIC
+    if LLM_PROVIDER == "anthropic":
+        if not LLM_API_KEY_ANTHROPIC:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+        model = LLM_MODEL_ANTHROPIC
+        api_key = LLM_API_KEY_ANTHROPIC
+    elif LLM_PROVIDER == "gemini":
+        if not LLM_API_KEY_GEMINI:
+            raise ValueError("GEMINI_API_KEY environment variable is not set")
+        model = LLM_MODEL_GEMINI
+        api_key = LLM_API_KEY_GEMINI
+    else:
+        raise ValueError(f"Unsupported LLM provider: {LLM_PROVIDER}")
 
     lm = dspy.LM(
         model=model,
-        api_key=llm_api_key,
+        api_key=api_key,
         max_tokens=LLM_MAX_TOKENS,
     )
 
