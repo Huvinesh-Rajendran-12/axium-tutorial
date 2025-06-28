@@ -2,6 +2,18 @@
 
 An AI-powered web application that generates recipe suggestions with nutritional analysis from a list of ingredients. Built with FastAPI, DSPy, and modern web technologies.
 
+## Demo Videos
+
+### 🤖 Agentic Mode Demo
+[![Agentic Recipe Generator Demo](https://img.youtube.com/vi/x2uaiB7PVgU/0.jpg)](https://youtu.be/x2uaiB7PVgU)
+
+*Watch the agentic mode in action with tool-enhanced recipe generation, accurate nutrition calculation, and smart ingredient validation.*
+
+### 🧠 Standard Mode Demo
+[![Standard Recipe Generator Demo](https://img.youtube.com/vi/JqYX7BkJHd8/0.jpg)](https://youtu.be/JqYX7BkJHd8)
+
+*See the standard mode providing fast recipe generation using pure DSPy modules.*
+
 ## Overview
 
 Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
