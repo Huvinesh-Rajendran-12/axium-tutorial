@@ -14,6 +14,8 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
 ## Features
 
 ### Core Features
+- **Dual Mode Operation**: Choose between standard DSPy or agentic tool-based generation
+- **Model Selection**: Switch between Anthropic Claude and Google Gemini models
 - **Ingredient Input**: Simple comma-separated ingredient list
 - **Recipe Generation**: AI-powered recipe creation with structured output
 - **Nutritional Analysis**: Calories, protein, and carbohydrate information
@@ -32,7 +34,7 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
 ### Backend
 - **Framework**: FastAPI
 - **AI/ML**: DSPy (Stanford's prompt optimization framework)
-- **Language Model**: Supports OpenAI, Anthropic, or custom LLMs
+- **Language Model**: Supports Anthropic Claude and Google Gemini
 - **Validation**: Pydantic
 - **Server**: Uvicorn
 
@@ -45,7 +47,7 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
 
 ### Prerequisites
 - Python 3.13+
-- API key for your chosen LLM (OpenAI, Anthropic, etc.)
+- API key for your chosen LLM (Anthropic or Gemini)
 - uv (recommended) or pip
 
 ### Backend Setup
@@ -66,21 +68,59 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
    ```
 
 3. **Configure environment**
+   ```bash
+   cp .env.example .env
+   ```
+   
    Edit `.env` and add your API credentials:
    ```env
-   # For Anthropic
-   LLM_PROVIDER=anthropic
-   LLM_MODEL_ANTHROPIC=claude-3-sonnet-20240229
-   ANTHROPIC_API_KEY=your-anthropic-api-key
-   LLM_MODEL_GEMINI=gemini-2.5-flash
-   GEMINI_API_KEY=your-gemini-api-key
+   # Anthropic Configuration
+   LLM_MODEL_ANTHROPIC=anthropic/claude-sonnet-4-20250514
+   ANTHROPIC_API_KEY=your-anthropic-api-key-here
+   
+   # Gemini Configuration
+   LLM_MODEL_GEMINI=gemini/gemini-2.5-flash
+   GEMINI_API_KEY=your-gemini-api-key-here
    ```
 
 4. **Run the server**
+   
+   **Standard Mode (Non-Agentic):**
    ```bash
    python run_backend.py
    # Or
    uv run run_backend.py
+   ```
+   
+   **Agentic Mode (With Tools):**
+   ```bash
+   python run_backend.py --agentic
+   # Or
+   uv run run_backend.py --agentic
+   ```
+   
+   **Model Selection:**
+   ```bash
+   # Use Anthropic Claude (default)
+   uv run run_backend.py --model anthropic
+   
+   # Use Google Gemini
+   uv run run_backend.py --model gemini
+   
+   # Combine options
+   uv run run_backend.py --agentic --model gemini
+   ```
+   
+   **Additional Options:**
+   ```bash
+   # Custom host and port
+   python run_backend.py --host 127.0.0.1 --port 8080
+   
+   # Enable debug mode
+   python run_backend.py --debug
+   
+   # All options combined
+   python run_backend.py --agentic --model anthropic --debug --port 8080
    ```
 
    The API will be available at `http://localhost:8000`
@@ -127,7 +167,8 @@ curl -X POST "http://localhost:8000/api/analyze" \
       }
     }
   ],
-  "status": "success"
+  "status": "success",
+  "mode": "agentic"
 }
 ```
 
@@ -153,11 +194,13 @@ smart-recipe-analyzer/
 │   ├── app.py                 # FastAPI application
 │   ├── config.py              # Configuration management
 │   ├── dspy_modules/          # DSPy components
-│   │   ├── recipe_analyzer.py # Main recipe generation logic
+│   │   ├── recipe_analyzer.py # Standard recipe generation logic
+│   │   ├── agentic_analyzer.py# Agentic recipe generation with tools
 │   │   └── signatures.py      # DSPy signatures
 │   ├── models/                # Pydantic models
 │   │   └── schemas.py         # Request/Response schemas
-│   └── tools/                 # Utility modules
+│   └── tools/                 # Agentic tools
+│       └── nutrition_calculator.py # Nutrition and cooking tools
 ├── frontend/                  # Frontend application (TBD)
 ├── tests/                     # Test suite (TBD)
 ├── .env.example              # Environment template
@@ -166,9 +209,28 @@ smart-recipe-analyzer/
 └── README.md                 # This file
 ```
 
+## Dual Mode Architecture
+
+The Smart Recipe Analyzer supports two distinct modes of operation:
+
+### 🧠 Standard Mode (default)
+Uses pure DSPy modules for fast generation:
+- **Direct LLM generation** with optimized prompts
+- **Faster response times** with single API calls
+- **Efficient JSON parsing** and validation
+- **Lightweight processing** without external tools
+
+### 🤖 Agentic Mode (--agentic)
+Uses specialized tools for enhanced accuracy:
+- **Tool-based nutrition calculation** with comprehensive ingredient database
+- **Smart ingredient validation** and automatic cleanup
+- **Realistic cooking time estimation** based on ingredient complexity
+- **Structured recipe generation** with validated data
+- **Multiple fallback layers** for reliability
+
 ## DSPy Architecture
 
-The application leverages DSPy's powerful features:
+The application leverages DSPy's powerful features with both standard and **agentic approaches**:
 
 1. **Signatures**: Define clear input/output specifications
 2. **Modules**: Use `ChainOfThought` for complex reasoning
@@ -179,6 +241,7 @@ The application leverages DSPy's powerful features:
 
 - **RecipeGenerationSignature**: Defines the contract for recipe generation
 - **SimpleRecipeGenerator**: Optimized single-call generator for fast responses
+- **SimpleAgenticAnalyzer**: Tool-enhanced generator with nutrition calculation
 - **RecipeAnalyzer**: Full pipeline with validation and enhancement
 
 ## Configuration
@@ -190,9 +253,12 @@ The application leverages DSPy's powerful features:
 | `HOST` | Server host | `0.0.0.0` |
 | `PORT` | Server port | `8000` |
 | `DEBUG` | Debug mode | `False` |
-| `LLM_PROVIDER` | LLM provider (openai/anthropic) | `openai` |
-| `LLM_MODEL` | Model name | `gpt-3.5-turbo` |
-| `LLM_API_KEY` | API key for LLM | Required |
+| `AGENTIC_MODE` | Enable agentic mode | `False` |
+| `LLM_PROVIDER` | LLM provider (anthropic/gemini) | `anthropic` |
+| `LLM_MODEL_ANTHROPIC` | Anthropic model | `anthropic/claude-sonnet-4-20250514` |
+| `LLM_MODEL_GEMINI` | Gemini model | `gemini/gemini-2.5-flash` |
+| `ANTHROPIC_API_KEY` | Anthropic API key | Required for Anthropic |
+| `GEMINI_API_KEY` | Gemini API key | Required for Gemini |
 | `LLM_TEMPERATURE` | Response creativity (0-1) | `0.7` |
 | `LLM_MAX_TOKENS` | Max response length | `2000` |
 | `DSPY_CACHE_DIR` | Cache directory | `.dspy_cache` |
@@ -201,8 +267,9 @@ The application leverages DSPy's powerful features:
 
 ### Running in Debug Mode
 ```bash
-export DEBUG=True
-python run_backend.py
+python run_backend.py --debug
+# Or with other options
+uv run run_backend.py --debug --agentic --model gemini
 ```
 
 ### Testing the API
@@ -219,11 +286,34 @@ print(response.json())
 
 ### Performance Optimization
 
-The backend uses `SimpleRecipeGenerator` by default for faster responses:
-- Single LLM call instead of multiple
-- Efficient JSON parsing
-- Quick fallback responses
+**Agentic Mode:**
+- Tool-based nutrition calculation (no guessing)
+- Smart ingredient validation and cleaning
+- Realistic cooking time estimation
+- Structured recipe generation with DSPy modules
+- Multiple fallback layers for reliability
+
+**Standard Mode:**
+- Faster response times with direct LLM calls
+- Lightweight processing without external tools
+- Efficient JSON parsing and validation
 - DSPy caching for repeated requests
+
+### Command Line Usage
+
+```bash
+# Show all available options
+python run_backend.py --help
+
+# Standard mode with Anthropic
+uv run run_backend.py
+
+# Agentic mode with Gemini
+uv run run_backend.py --agentic --model gemini
+
+# Debug mode with custom port
+uv run run_backend.py --debug --port 8080
+```
 
 ## TODO
 
