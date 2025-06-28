@@ -82,10 +82,13 @@ Smart Recipe Analyzer uses advanced AI (via DSPy framework) to:
 2. **Install dependencies**
 
    ```bash
-   # Using uv (recommended)
+   # Using uv sync (recommended - uses pyproject.toml and uv.lock)
+   uv sync
+
+   # Or using uv pip
    uv pip install -r requirements.txt
 
-   # Or using pip
+   # Or using standard pip
    pip install -r requirements.txt
    ```
 
