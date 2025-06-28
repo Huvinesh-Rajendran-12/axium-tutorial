@@ -17,13 +17,20 @@ HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", 8000))
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
+# Mode Configuration
+AGENTIC_MODE = os.getenv("AGENTIC_MODE", "False").lower() == "true"
+
 # CORS Configuration
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 # LLM Configuration
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")  # openai, anthropic, etc.
-LLM_MODEL = os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4-20250514")
-LLM_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic")  # anthropic, gemini
+LLM_MODEL_ANTHROPIC = os.getenv(
+    "LLM_MODEL_ANTHROPIC", "anthropic/claude-sonnet-4-20250514"
+)
+LLM_MODEL_GEMINI = os.getenv("LLM_MODEL_GEMINI", "gemini/gemini-2.5-flash")
+LLM_API_KEY_ANTHROPIC = os.getenv("ANTHROPIC_API_KEY", "")
+LLM_API_KEY_GEMINI = os.getenv("GEMINI_API_KEY", "")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.7"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2000"))
 
@@ -39,13 +46,22 @@ RATE_LIMIT_PERIOD = int(os.getenv("RATE_LIMIT_PERIOD", "3600"))  # seconds
 # Initialize DSPy
 def init_dspy():
     """Initialize DSPy with configured LLM."""
-    if not LLM_API_KEY:
-        raise ValueError("LLM_API_KEY environment variable is not set")
+    if LLM_PROVIDER == "anthropic":
+        if not LLM_API_KEY_ANTHROPIC:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is not set")
+        model = LLM_MODEL_ANTHROPIC
+        api_key = LLM_API_KEY_ANTHROPIC
+    elif LLM_PROVIDER == "gemini":
+        if not LLM_API_KEY_GEMINI:
+            raise ValueError("GEMINI_API_KEY environment variable is not set")
+        model = LLM_MODEL_GEMINI
+        api_key = LLM_API_KEY_GEMINI
+    else:
+        raise ValueError(f"Unsupported LLM provider: {LLM_PROVIDER}")
 
-        # Default to OpenAI-compatible endpoint
     lm = dspy.LM(
-        model=LLM_MODEL,
-        api_key=LLM_API_KEY,
+        model=model,
+        api_key=api_key,
         max_tokens=LLM_MAX_TOKENS,
     )
 

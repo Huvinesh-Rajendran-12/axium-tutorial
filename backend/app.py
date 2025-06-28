@@ -7,13 +7,14 @@ from typing import Dict, Any
 
 from .config import (
     API_VERSION, API_TITLE, API_DESCRIPTION,
-    ALLOWED_ORIGINS, init_dspy, DEBUG
+    ALLOWED_ORIGINS, init_dspy, DEBUG, AGENTIC_MODE
 )
 from .models.schemas import (
     RecipeRequest, RecipeResponse, ErrorResponse, 
     HealthCheckResponse, Recipe
 )
 from .dspy_modules.recipe_analyzer import RecipeAnalyzer, SimpleRecipeGenerator
+from .dspy_modules.agentic_analyzer import SimpleAgenticAnalyzer
 
 # Configure logging
 logging.basicConfig(
@@ -36,10 +37,13 @@ async def lifespan(app: FastAPI):
         logger.info("Initializing DSPy...")
         init_dspy()
         
-        # Initialize recipe analyzer
-        logger.info("Initializing Recipe Analyzer...")
-        # Use SimpleRecipeGenerator for faster responses
-        recipe_analyzer = SimpleRecipeGenerator()
+        # Initialize recipe analyzer based on mode
+        if AGENTIC_MODE:
+            logger.info("Initializing Agentic Recipe Analyzer with tools...")
+            recipe_analyzer = SimpleAgenticAnalyzer()
+        else:
+            logger.info("Initializing Standard Recipe Analyzer...")
+            recipe_analyzer = SimpleRecipeGenerator()
         
         logger.info("Application startup complete")
         yield
@@ -110,9 +114,11 @@ async def root():
 @app.get("/health", response_model=HealthCheckResponse)
 async def health_check():
     """Health check endpoint."""
+    mode = "agentic" if AGENTIC_MODE else "standard"
     return HealthCheckResponse(
         status="healthy",
-        version=API_VERSION
+        version=API_VERSION,
+        mode=mode
     )
 
 
@@ -173,9 +179,11 @@ async def analyze_ingredients(request: RecipeRequest):
                 )
             ]
         
+        mode = "agentic" if AGENTIC_MODE else "standard"
         return RecipeResponse(
             recipes=validated_recipes,
-            status="success"
+            status="success",
+            mode=mode
         )
         
     except Exception as e:
@@ -226,7 +234,8 @@ async def get_example():
                 }
             )
         ],
-        status="success"
+        status="success",
+        mode="example"
     )
 
 

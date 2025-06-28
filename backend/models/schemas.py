@@ -43,6 +43,7 @@ class RecipeResponse(BaseModel):
     """Response model for recipe analysis."""
     recipes: List[Recipe] = Field(..., description="List of generated recipes")
     status: str = Field("success", description="Response status")
+    mode: str = Field(..., description="Generation mode (agentic or standard)")
 
 
 class ErrorResponse(BaseModel):
@@ -56,3 +57,4 @@ class HealthCheckResponse(BaseModel):
     """Health check response."""
     status: str = Field("healthy", description="Service status")
     version: str = Field("1.0.0", description="API version")
+    mode: str = Field(..., description="Current analyzer mode")
