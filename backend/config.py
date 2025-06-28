@@ -44,8 +44,8 @@ def init_dspy():
 
         # Default to OpenAI-compatible endpoint
     lm = dspy.LM(
-        model="gemini/gemini-2.5-flash",
-        api_key="AIzaSyDXX25eYmZU4XMGCvzeWK5DJr1Of-Q9C3U",
+        model=LLM_MODEL,
+        api_key=LLM_API_KEY,
         max_tokens=LLM_MAX_TOKENS,
     )
 
